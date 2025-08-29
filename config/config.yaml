@@ -1,0 +1,10 @@
+# Determine of finished exploring
+threshold: 5
+
+# Configuration for ExplorerNode
+strategy: "weighted"   # Strategy can be "ratio", "nearest" or "weighted"
+alpha: 10.0      # Weight for information gain
+beta: 5.0       # Weight for cost to reach goal
+
+# Explore rate
+explore_rate: 5.0  # seconds
