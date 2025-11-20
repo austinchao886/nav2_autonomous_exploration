@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import OccupancyGrid
+from nav_msgs.msg import Odometry,Path
 from geometry_msgs.msg import PoseStamped
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
@@ -23,6 +24,18 @@ class ExplorerNode(Node):
         # Subscriber to the map topic
         self.map_sub = self.create_subscription(
             OccupancyGrid, '/map', self.map_callback, 10)
+        
+        # Subscriber to the odometry topic (if needed for robot position)
+        self.odom_sub = self.create_subscription(
+            Odometry, '/odom', self.odom_callback, 10)
+        self.path_publisher = self.create_publisher(
+            Path, '/exploration_path', 10)
+        
+        self.exploration_path = Path()
+        self.exploration_path.header.frame_id = 'odom'
+        
+        self.prev_odom = None
+        self.total_distance = 0.0
 
         # Action client for navigation
         self.nav_to_pose_client = ActionClient(
@@ -37,6 +50,42 @@ class ExplorerNode(Node):
 
         # Timer for periodic exploration
         self.timer = self.create_timer(self.config.explore_rate, self.explore)
+
+        # Start the exploration timer
+        self.start_time = self.get_clock().now()
+
+        # Get Distance and Time Information
+        self.print_information_timer = self.create_timer(5.0, self.print_information)
+
+    def odom_callback(self, msg): # msg is respect to world frame
+        if self.prev_odom is None:
+            self.prev_odom = msg
+            return
+        
+        # Update robot position
+        distance = np.sqrt(
+            (msg.pose.pose.position.x - self.prev_odom.pose.pose.position.x) ** 2 +
+            (msg.pose.pose.position.y - self.prev_odom.pose.pose.position.y) ** 2
+        )
+
+        # Draw Path
+        path_pose = PoseStamped()
+        path_pose.header.frame_id = 'odom'
+        path_pose.header.stamp = msg.header.stamp
+        path_pose.pose = msg.pose.pose
+        self.exploration_path.poses.append(path_pose)
+        self.path_publisher.publish(self.exploration_path)
+
+        self.total_distance += distance
+        self.prev_odom = msg
+
+        self.robot_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+    
+    def print_information(self):
+        elapsed_time = (self.get_clock().now() - self.start_time).nanoseconds / 1e9
+        self.get_logger().info(
+            f"Elapsed Time: {elapsed_time:.2f} seconds, Total Distance Travelled: {self.total_distance:.2f} meters"
+        )
 
     def map_callback(self, msg):
         self.map_data = msg
