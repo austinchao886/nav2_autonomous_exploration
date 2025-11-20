@@ -9,6 +9,7 @@ from omegaconf import OmegaConf
 from ament_index_python.packages import get_package_share_directory
 import os
 
+
 class ExplorerNode(Node):
     def __init__(self):
         super().__init__('explorer')
@@ -24,7 +25,8 @@ class ExplorerNode(Node):
             OccupancyGrid, '/map', self.map_callback, 10)
 
         # Action client for navigation
-        self.nav_to_pose_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        self.nav_to_pose_client = ActionClient(
+            self, NavigateToPose, 'navigate_to_pose')
 
         # Visited frontiers set
         self.visited_frontiers = set()
@@ -35,7 +37,7 @@ class ExplorerNode(Node):
 
         # Timer for periodic exploration
         self.timer = self.create_timer(self.config.explore_rate, self.explore)
-        
+
     def map_callback(self, msg):
         self.map_data = msg
         self.get_logger().info("Map received")
@@ -83,7 +85,8 @@ class ExplorerNode(Node):
         """
         try:
             result = future.result().result
-            self.get_logger().info(f"Navigation completed with result: {result}")
+            self.get_logger().info(
+                f"Navigation completed with result: {result}")
         except Exception as e:
             self.get_logger().error(f"Navigation failed: {e}")
 
@@ -115,16 +118,17 @@ class ExplorerNode(Node):
         best_score = -float('inf')
         chosen_frontier = None
 
-        strategy = self.config.strategy 
-        alpha = self.config.alpha 
-        beta = self.config.beta 
-        
+        strategy = self.config.strategy
+        alpha = self.config.alpha
+        beta = self.config.beta
+
         for frontier in frontiers:
             if frontier in self.visited_frontiers:
                 continue
 
             # Distance to robot (Euclidean in grid coordinates)
-            distance = np.sqrt((robot_row - frontier[0])**2 + (robot_col - frontier[1])**2)
+            distance = np.sqrt(
+                (robot_row - frontier[0])**2 + (robot_col - frontier[1])**2)
 
             if distance < 1e-6:
                 continue  # skip if robot is already at frontier
@@ -142,7 +146,8 @@ class ExplorerNode(Node):
             elif strategy == "weighted":
                 score = alpha * info_gain - beta * distance
             else:
-                self.get_logger().warning(f"Unknown strategy {strategy}, fallback to nearest")
+                self.get_logger().warning(
+                    f"Unknown strategy {strategy}, fallback to nearest")
                 score = -distance
 
             if score > best_score:
@@ -157,7 +162,6 @@ class ExplorerNode(Node):
             self.get_logger().warning("No valid frontier found")
 
         return chosen_frontier
-    
 
     def finish_if_map_complete(self, frontiers, threshold=None):
         """
@@ -166,7 +170,8 @@ class ExplorerNode(Node):
         if threshold is None:
             threshold = getattr(self, 'threshold', 5)
         if len(frontiers) <= threshold:
-            self.get_logger().info(f"Frontiers below threshold ({threshold}). Exploration complete!")
+            self.get_logger().info(
+                f"Frontiers below threshold ({threshold}). Exploration complete!")
             # self.shutdown_robot()
             # Optionally, stop the timer to halt further exploration
             self.timer.cancel()
@@ -199,16 +204,18 @@ class ExplorerNode(Node):
             return
 
         # Convert the chosen frontier to world coordinates
-        goal_x = chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
-        goal_y = chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y
+        goal_x = chosen_frontier[1] * self.map_data.info.resolution + \
+            self.map_data.info.origin.position.x
+        goal_y = chosen_frontier[0] * self.map_data.info.resolution + \
+            self.map_data.info.origin.position.y
 
         # Navigate to the chosen frontier
         self.navigate_to(goal_x, goal_y)
 
+
 def main(args=None):
     rclpy.init(args=args)
     explorer_node = ExplorerNode()
-
     try:
         explorer_node.get_logger().info("Starting exploration...")
         rclpy.spin(explorer_node)
