@@ -9,6 +9,7 @@ import numpy as np
 from omegaconf import OmegaConf
 from ament_index_python.packages import get_package_share_directory
 import os
+from collections import deque
 
 
 class ExplorerNode(Node):
@@ -139,12 +140,52 @@ class ExplorerNode(Node):
         except Exception as e:
             self.get_logger().error(f"Navigation failed: {e}")
 
+    def cluster_frontiers(self, candidate_mask: np.ndarray):
+        rows, cols = candidate_mask.shape
+        visited = np.zeros_like(candidate_mask, dtype=bool)
+        clusters = []
+
+        neighbor_offsets = [
+            (-1, -1), (-1, 0), (-1, 1),
+            (0, -1),           (0, 1),
+            (1, -1),  (1, 0),  (1, 1),
+        ]       
+
+        for r in range(rows):
+            for c in range(cols):
+                if candidate_mask[r,c] != 1 or visited[r,c]:
+                    continue
+                # Start a new cluster
+                cluster = []
+                queue = deque()
+                queue.append((r,c))
+                visited[r,c] = True
+
+                while queue:
+                    cr, cc = queue.popleft()
+                    cluster.append((cr,cc))
+                    for dr, dc in neighbor_offsets:
+                        nr, nc = cr + dr, cc + dc
+                        # Frontier bounds check
+                        if nr < 0 or nr >= rows or nc < 0 or nc >= cols:
+                            continue
+                        # only add unvisited frontier cells
+                        if candidate_mask[nr, nc] == 1 and not visited[nr, nc]:
+                            visited[nr, nc] = True
+                            queue.append((nr, nc))
+                
+                clusters.append(cluster)
+        self.get_logger().info(f"[cluster_frontiers] Found {len(clusters)} clusters.")
+        return clusters
+
     def find_frontiers(self, map_array):
         """
         Detect frontiers in the occupancy grid map.
         """
         frontiers = []
         rows, cols = map_array.shape
+
+        candidate_mask = np.zeros_like(map_array, dtype=np.uint8)
 
         # Iterate through each cell in the map
         for r in range(1, rows - 1):
@@ -153,9 +194,23 @@ class ExplorerNode(Node):
                     # Check if any neighbors are unknown
                     neighbors = map_array[r-1:r+2, c-1:c+2].flatten()
                     if -1 in neighbors:
-                        frontiers.append((r, c))
+                        candidate_mask[r, c] = 1
 
-        self.get_logger().info(f"Found {len(frontiers)} frontiers")
+        # Extract frontier points from candidate mask
+        clusters = self.cluster_frontiers(candidate_mask)
+
+        for cluster in clusters:
+            # Compute the centroid of the cluster
+            if len(cluster) == 0:
+                continue
+            centroid_r = int(np.mean([pt[0] for pt in cluster]))
+            centroid_c = int(np.mean([pt[1] for pt in cluster]))
+            frontiers.append((centroid_r, centroid_c))
+
+        self.get_logger().info(
+            f"[find_frontiers]Candidate cells: {int(candidate_mask.sum())}, "
+            f"clusters found: {len(clusters)}, centroids={len(frontiers)}"
+        )
         return frontiers
 
     def choose_frontier(self, frontiers, map_array):
@@ -238,6 +293,12 @@ class ExplorerNode(Node):
 
         # Detect frontiers
         frontiers = self.find_frontiers(map_array)
+
+        self.get_logger().info(
+            f"Exploration: {len(frontiers)} frontier regions detected."
+        )
+
+        return
 
         # Finish if frontiers are below threshold
         if self.finish_if_map_complete(frontiers):
