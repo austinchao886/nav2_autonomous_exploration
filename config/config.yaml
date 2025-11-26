@@ -1,5 +1,5 @@
 # Determine of finished exploring
-threshold: 5
+threshold: 0
 
 # Configuration for ExplorerNode
 strategy: "weighted"   # Strategy can be "ratio", "nearest" or "weighted"
