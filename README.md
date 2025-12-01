@@ -70,3 +70,40 @@ ros2 launch slam_toolbox online_async_launch.py
 ```bash
 ros2 run custom_explorer explorer_cost_function
 ```
+
+## Algorithm Development and Improvements
+
+This section describes the strategy developed for selecting frontier points during autonomous exploration.
+
+### Initial Approach: Naive Method
+
+Initially, a naive method was implemented to select goal points. This approach:
+- Used only the occupancy map to obtain map information
+- Identified frontier cells as those with unknown (-1) values adjacent to known cells
+- Selected the nearest frontier cell as the goal point
+
+### Improved Strategy
+
+The algorithm was enhanced with the following improvements:
+- **Frontier Clustering**: Grouped frontier points into meaningful clusters
+- **Frontier Filtering**: Applied filters to eliminate unsuitable frontier candidates
+- **Goal Selection Fine-tuning**: Optimized the strategy for selecting the most efficient goal points
+
+### Performance Comparison
+
+The improvements resulted in significantly more efficient exploration, as demonstrated by the reduction in total exploration distance.
+
+| Method | Total Exploration Distance | Improvement |
+|--------|---------------------------|-------------|
+| Before (Naive Method) | [241.68] | Baseline |
+| After (Improved Strategy) | [182.26] | ↓ [25]% |
+
+**Before (Naive Method):**
+
+![Before Improvement](doc/before.png)
+
+**After (Improved Strategy):**
+
+![After Improvement](doc/after.png)
+
+The results clearly show that the robot explores more efficiently with the improved algorithm, covering the same area with reduced travel distance.
