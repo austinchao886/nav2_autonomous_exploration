@@ -95,8 +95,8 @@ The improvements resulted in significantly more efficient exploration, as demons
 
 | Method | Total Exploration Distance | Improvement |
 |--------|---------------------------|-------------|
-| Before (Naive Method) | [241.68] | Baseline |
-| After (Improved Strategy) | [182.26] | ↓ [25]% |
+| Before (Naive Method) | 241.68 | Baseline |
+| After (Improved Strategy) | 182.26 | ↓ 25% |
 
 **Before (Naive Method):**
 
