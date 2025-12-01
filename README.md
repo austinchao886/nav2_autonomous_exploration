@@ -6,13 +6,7 @@ This package provides an autonomous exploration algorithm designed for robots to
 
 ## Demo
 
-https://github.com/austinchao886/nav2_autonomous_exploration/assets/your-video-id/auto_exploration.mp4
-
-> **Note:** To display the video above, upload `doc/auto_exploration.mp4` by:
-> 1. Go to any issue or pull request in this repository
-> 2. Drag and drop the video file into a comment box
-> 3. GitHub will upload it and generate a URL
-> 4. Replace the placeholder URL above with the generated link
+![Autonomous Exploration Demo](doc/auto_exploration.gif)
 
 ## Build and Execute
 
@@ -21,14 +15,18 @@ https://github.com/austinchao886/nav2_autonomous_exploration/assets/your-video-i
 1. Create a workspace directory and clone this repository:
 ```bash
 mkdir -p ~/ros2_ws/src
+
 cd ~/ros2_ws/src
-git clone <repository-url>
+
+git clone https://github.com/austinchao886/nav2_autonomous_exploration.git
 ```
 
 2. Build the workspace:
 ```bash
 cd ~/ros2_ws
+
 colcon build
+
 source install/setup.bash
 ```
 
@@ -39,6 +37,7 @@ You can test this algorithm using the ROS 2 Gazebo system with TurtleBot3.
 1. **Clone TurtleBot3 Gazebo** (if not already installed):
 ```bash
 cd ~/ros2_ws/src
+
 git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
 ```
 
