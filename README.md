@@ -6,8 +6,13 @@ This package provides an autonomous exploration algorithm designed for robots to
 
 ## Demo
 
-<video src="doc/auto_exploration.mp4" controls width="600">
-</video>
+https://github.com/austinchao886/nav2_autonomous_exploration/assets/your-video-id/auto_exploration.mp4
+
+> **Note:** To display the video above, upload `doc/auto_exploration.mp4` by:
+> 1. Go to any issue or pull request in this repository
+> 2. Drag and drop the video file into a comment box
+> 3. GitHub will upload it and generate a URL
+> 4. Replace the placeholder URL above with the generated link
 
 ## Build and Execute
 
