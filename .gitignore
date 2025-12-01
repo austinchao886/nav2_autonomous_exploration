@@ -1,24 +1,24 @@
-# # Python
-# __pycache__/
-# *.py[cod]
-# *.so
-# *.egg
-# *.egg-info/
-# dist/
-# build/
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
 
-# # ROS2 build and install
-# build/
-# install/
-# log/
+# ROS2 build and install
+build/
+install/
+log/
 
-# # VSCode
-# .vscode/
+# VSCode
+.vscode/
 
-# # OS files
-# .DS_Store
-# Thumbs.db
+# OS files
+.DS_Store
+Thumbs.db
 
-# # Other
-# *.swp
-# *.swo
+# Other
+*.swp
+*.swo

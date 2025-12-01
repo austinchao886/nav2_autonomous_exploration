@@ -1,232 +1,68 @@
-<<<<<<< HEAD
-# meamr_frontier_explore
-
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/meamr/meamr_frontier_explore.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/meamr/meamr_frontier_explore/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
+# Autonomous Exploration
 
 ## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+This package provides an autonomous exploration algorithm designed for robots to explore unknown environments. Built on ROS 2 Humble, it works in collaboration with SLAM (Simultaneous Localization and Mapping) algorithms to receive real-time map data, identify frontiers (boundaries between known and unknown areas), and autonomously assign goal poses at these frontiers to guide the robot's exploration strategy.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Demo
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+<video src="doc/auto_exploration.mp4" controls width="600">
+</video>
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## Build and Execute
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Building the Package
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+1. Create a workspace directory and clone this repository:
+```bash
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone <repository-url>
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+2. Build the workspace:
+```bash
+cd ~/ros2_ws
+colcon build
+source install/setup.bash
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+### Testing with Gazebo Simulation
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+You can test this algorithm using the ROS 2 Gazebo system with TurtleBot3.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+1. **Clone TurtleBot3 Gazebo** (if not already installed):
+```bash
+cd ~/ros2_ws/src
+git clone -b humble https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+```
 
-## License
-For open source projects, say how it is licensed.
+2. **Create a custom world launch file** `diff_car_world.launch.py` and modify the world path:
+```python
+world = os.path.join(
+    get_package_share_directory('turtlebot3_gazebo'),
+    'worlds',
+    'my_world.world'
+)
+```
+The `my_world.world` file is the testing world located in the `/maps` directory. This will spawn the robot and the world in the Gazebo simulation.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-=======
-# Autonomous Explorer Node for Frontier Exploration
+3. **Launch the Gazebo simulation**:
+```bash
+ros2 launch turtlebot3_gazebo diff_car_world.launch.py
+```
 
-This repository contains a ROS 2 package implementing an autonomous frontier exploration algorithm using Nav2. The Explorer Node subscribes to a map, detects frontiers, and sends navigation goals to explore the environment.
+4. **Start the Navigation2 stack**:
+```bash
+ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True
+```
 
----
+5. **Launch the SLAM algorithm**:
+```bash
+ros2 launch slam_toolbox online_async_launch.py
+```
 
-https://github.com/user-attachments/assets/08ac6c13-06b5-48d4-823c-2e0e4aa61169
-
-## Features
-
-- **Frontier Detection**: Automatically detects frontiers (unknown areas) in the map.
-- **Autonomous Navigation**: Uses Nav2's `NavigateToPose` action to navigate to frontiers.
-- **Dynamic Goal Selection**: Chooses the closest unexplored frontier for efficient exploration.
-- **ROS 2-Based**: Compatible with ROS 2 (tested on Humble or Foxy distribution).
-- **Customizable Timer**: Adjust the exploration frequency as needed.
-
----
-
-## Requirements
-
-- ROS 2 (Humble/Foxy)
-- Python 3
-- TurtleBot3 packages installed
-- Nav2 installed and configured for your robot
-- SLAM Toolbox installed
-- `numpy` Python library
-
----
-
-## Setup
-
-1. Clone the repository into your ROS 2 workspace:
-
-    ```bash
-    cd ~/ros2_ws/src
-    git clone https://github.com/AniArka/Autonomous-Explorer-and-Mapper-ros2-nav2.git
-    cd ~/ros2_ws
-    colcon build
-    ```
-
-2. Install dependencies:
-
-    ```bash
-    pip install numpy
-    ```
-
-3. Source the workspace:
-
-    ```bash
-    source ~/ros2_ws/install/setup.bash
-    ```
-
----
-
-## Testing with TurtleBot3
-
-Follow these steps to test the Explorer Node with TurtleBot3 in a Gazebo simulation:
-
-1. Launch the TurtleBot3 world in Gazebo:
-
-    ```bash
-    ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
-    ```
-
-2. Start the Nav2 stack:
-
-    ```bash
-    ros2 launch nav2_bringup navigation_launch.py use_sim_time:=True
-    ```
-
-3. Launch SLAM Toolbox for mapping:
-
-    ```bash
-    ros2 launch slam_toolbox online_async_launch.py
-    ```
-
-4. Launch RViz for visualization:
-
-    ```bash
-    ros2 launch nav2_bringup rviz_launch.py
-    ```
-
-5. Run the Explorer Node:
-
-    ```bash
-    ros2 run custom_explorer explorer
-    ```
-
----
-
-## How It Works
-
-1. **Map Subscription**: Subscribes to the `/map` topic to receive occupancy grid maps.
-2. **Frontier Detection**: Identifies free cells adjacent to unknown areas as frontiers.
-3. **Navigation**: Sends goals to Nav2's `NavigateToPose` action server for autonomous navigation to the closest frontier.
-4. **Dynamic Goal Selection**: Continuously updates and selects frontiers during exploration.
-
----
-
-## Code Structure
-
-- `explorer.py`: Main node for detecting frontiers and sending navigation goals.
-- `requirements.txt`: Python dependencies.
-- `README.md`: Project documentation.
-
----
-
-## Example Workflow
-
-1. **Start the TurtleBot3 simulation environment**.
-2. **Run the Explorer Node** as shown in the "Testing with TurtleBot3" section.
-3. **Visualize progress in RViz** as the robot autonomously explores the environment.
-
----
-
-## Future Improvements
-
-- Add support for multi-robot exploration.
-- Implement a more advanced frontier selection algorithm.
-- Optimize for larger environments.
-
----
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.
-
----
-
-
-## Acknowledgments
-
-- [ROS 2 Documentation](https://docs.ros.org/en/rolling/index.html)
-- [Nav2](https://navigation.ros.org/)
-- [SLAM Toolbox](https://github.com/SteveMacenski/slam_toolbox)
-- [TurtleBot3](https://www.turtlebot.com/)
->>>>>>> 77cb243 (frontier exploration v1.0 add three strategy: weight, nearest and ratio)
+6. **Run the autonomous exploration algorithm**:
+```bash
+ros2 run custom_explorer explorer_cost_function
+```
